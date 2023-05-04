@@ -15,7 +15,7 @@ const routes = [
         component: Administractor
     },
     {
-        path: '/Customer/:cardId/:identity',
+        path: '/Customer/:cardId    ',
         name: 'Customer',
         component: Customer,
         props: true

@@ -1,15 +1,19 @@
 <template>
   <Cheader></Cheader>
   <div class="register-container">
-    <div class="register-box" :style="{height: cardId ? '300px' : '250px', transition: 'height 1s'}">
+    <div class="register-box" :style="{height: cardId ? '350px' : '300px', transition: 'height 1s'}">
       <div class="options">
         <label for="teacher">
-          <input type="radio" id="teacher" name="identity" value="teacher" v-model="identity">老师
+          <input type="radio" id="teacher" name="identity" value="T" v-model="identity">老师
         </label>
         <label for="student">
-          <input type="radio" id="student" name="identity" value="student" v-model="identity">学生
+          <input type="radio" id="student" name="identity" value="S" v-model="identity">学生
         </label>
       </div>
+      <div class="department">
+        <label for="name" >姓名：</label>
+        <input type="text" id="name" v-model="name">
+      </div><br>
       <div class="department">
         <label for="department">部门：</label>
         <input type="text" id="department" v-model="department">
@@ -18,12 +22,14 @@
         <span v-show="cardId">您的id为: <span class="large" >{{ cardId }}</span></span>
       </p>
       <button @click="registerCardId">注册</button>
+      <button @click="backHome">返回主页</button>
     </div>
   </div>
 </template>
 
 <script>
 import Cheader from "@/components/Cheader.vue";
+import axios from "axios";
 export default {
   name: "Register",
   components:{
@@ -33,14 +39,36 @@ export default {
     return {
       cardId: null,
       department:null,
-      identity:null
+      identity:null,
+      name:null
     };
   },
   methods: {
+    backHome(){
+      this.$router.push({ name: 'Guide' });
+    },
     registerCardId() {
-      // 模拟注册操作，可以替换为实际的注册逻辑
-      this.cardId = "xxxx";
-      console.log(this.cardId,this.department,this.identity)//打印看看
+      if(!this.name||!this.department||!this.identity){alert("请填写所有信息");return}
+      let data = {
+        name: this.name,
+        department: this.department,
+        type: this.identity
+      };
+      //post要写成data
+      axios.post("http://localhost:8050/register", data)
+          .then(response => {
+            if(response.data.ok==true){
+              this.cardId=response.data.message
+            }else if(response.data.message=="dup"){
+              alert("重复注册")
+            }else{
+              alert("接口错误")
+            }
+            console.log(response);
+          })
+          .catch(error => {
+            console.error(error);
+          });
     },
   },
 

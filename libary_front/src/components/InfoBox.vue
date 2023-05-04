@@ -2,41 +2,40 @@
   <div class="info-box">
     <h2>请输入信息</h2>
     <label>Card ID:</label>
-    <input type="text" v-model="cardId">
-    <div>
-      <label>
-        <input type="radio" value="teacher" v-model="identity">
-<!--        动态绑定值到identity-->
-        老师
-      </label>
-      <label>
-        <input type="radio" value="student" v-model="identity">
-        学生
-      </label>
-    </div>
+    <input type="number" v-model="cardId">
     <button class="submit-btn" @click="submit">提交</button>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "InfoBox",
   data() {
     return {
-      cardId: "",
-      identity: "",
+      cardId: null,
     };
   },
   methods: {
     submit() {
-      // 在这里可以提交表单信息
-      this.$router.push({
-        name: "Customer",
-        params: {
-          cardId: this.cardId,
-          identity: this.identity
-        }
-      });
+      let params = new URLSearchParams();
+      params.append('cardId',this.cardId)
+      axios.get("http://localhost:8050/checkCard",{params:params})
+          .then(response=>{
+            if(response.data.ok){
+              this.$router.push({// 在这里可以提交表单信息
+                name: "Customer",
+                params: {
+                  cardId: this.cardId,
+                }
+              });
+            }else{
+              alert("不存在的卡号，请先注册")
+            }
+          })
+
+
     },
   },
 }
